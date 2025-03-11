@@ -175,14 +175,16 @@ async def _api_web(
     func: str
 ):
     params = dict(request.query_params)
-    parser = Parser(module, func, params)
-    credential = qqmusic_api.Credential.from_cookies_dict(request.cookies)
-    qqmusic_api.get_session().credential = credential
-    result, errors = await parser.parse()
+    proxy = params.pop("proxy", None)
+    async with qqmusic_api.Session(proxy=proxy):
+        parser = Parser(module, func, params)
+        credential = qqmusic_api.Credential.from_cookies_dict(request.cookies)
+        qqmusic_api.get_session().credential = credential
+        result, errors = await parser.parse()
 
-    if not parser.valid or errors:
-        return {"code": 1, "error": errors}
-    return {"code": 0, "data": result}
+        if not parser.valid or errors:
+            return {"code": 1, "error": errors}
+        return {"code": 0, "data": result}
 
 
 app.add_api_route("/{module}/{func}", _api_web, methods=["GET"])
