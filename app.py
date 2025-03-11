@@ -1,9 +1,9 @@
 """WEB API Port"""
 
+import types
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-import types
 from typing import Any, Union, get_args, get_origin
 
 from fastapi import FastAPI, Request, Response
@@ -172,7 +172,7 @@ async def _api_web(
     request: Request,
     response: Response,
     module: str,
-    func: str,
+    func: str
 ):
     params = dict(request.query_params)
     parser = Parser(module, func, params)
